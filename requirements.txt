@@ -1,0 +1,11 @@
+# PDF Processing
+pdfplumber>=0.7.0
+PyPDF2>=3.0.0
+pdfminer.six>=2022.0.0
+
+# Data Manipulation and Analysis
+pandas>=1.5.0
+numpy>=1.24.0
+
+# Encryption
+cryptography>=41.0.0

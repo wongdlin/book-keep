@@ -1,0 +1,54 @@
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment
+.env
+
+# Project files
+input/
+output/
+config/credentials.json
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Security - IMPORTANT!
+passwords.json
+master.key
+*.key
+data/passwords.json
+data/master.key
+data/*.key
+
+# PDF files - IMPORTANT!
+*.pdf
+pdf_files/input/*.pdf
+pdf_files/output/*.pdf
+pdf_files/unlocked/*.pdf
+
+# Temporary files
+temp/
+tmp/
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Test artifacts
+test_*.json
+test_*.key
