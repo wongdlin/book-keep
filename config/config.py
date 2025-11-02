@@ -9,7 +9,7 @@ from typing import Optional
 class Config:
     """Centralized configuration for BookKeep"""
     
-    # Project root directory
+    # Project root directory (config/ is in project root)
     PROJECT_ROOT = Path(__file__).parent.parent
     
     # PDF file directories
@@ -78,4 +78,5 @@ class Config:
             return str(path.relative_to(Config.PROJECT_ROOT))
         except ValueError:
             return str(path)
+
 

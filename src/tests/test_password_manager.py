@@ -10,8 +10,10 @@ import shutil
 from pathlib import Path
 from unittest.mock import patch, Mock
 
-# Add the src directory to the path so we can import our modules
-sys.path.append(str(Path(__file__).parent.parent))
+# Add the project root and src to the path so we can import our modules
+project_root = Path(__file__).parent.parent.parent
+sys.path.append(str(project_root))
+sys.path.append(str(project_root / "src"))
 
 from password_manager import PasswordManager
 from test_runner import run_test_suite
