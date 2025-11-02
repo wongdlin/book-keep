@@ -11,6 +11,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from transaction_parser import TransactionParser
+from config import Config
 from PyPDF2 import PdfReader
 from test_runner import run_test_suite
 
@@ -19,7 +20,7 @@ def test_debug_transaction_extraction():
     print("\n🔍 Debug: Detailed Transaction Extraction Analysis")
     print("=" * 60)
     
-    pdf_path = Path("pdf_files/unlocked/tng_ewallet_transactions.pdf")
+    pdf_path = Config.get_pdf_unlocked_dir() / "tng_ewallet_transactions.pdf"
     
     if not pdf_path.exists():
         print(f"❌ PDF not found: {pdf_path}")

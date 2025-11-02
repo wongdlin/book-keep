@@ -1,13 +1,14 @@
 import json
 import base64
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Optional
 from cryptography.fernet import Fernet
+from config import Config
 
 class PasswordManager:
-    def __init__(self, passwords_file="data/passwords.json", master_key_file="data/master.key"):
-        self.passwords_file = Path(passwords_file)
-        self.master_key_file = Path(master_key_file)
+    def __init__(self, passwords_file: Optional[str] = None, master_key_file: Optional[str] = None):
+        self.passwords_file = Path(passwords_file) if passwords_file else Config.get_passwords_file()
+        self.master_key_file = Path(master_key_file) if master_key_file else Config.get_master_key_file()
         self.cipher_suite = self._initialize_encryption()
         self.passwords = self.load_passwords()
     

@@ -6,21 +6,23 @@ A Python-based application that unlocks password-protected PDF files and process
 
 - **🔓 PDF Password Unlocking**: Automatically unlock password-protected PDFs using encrypted password storage
 - **🔐 Secure Password Management**: Encrypted password storage with master key encryption
+- **📄 PDF Transaction Extraction**: Parse transaction data from unlocked PDFs with intelligent pattern matching
+- **📊 CSV Export**: Export extracted transactions to CSV files with incremental naming
 - **📁 File Organization**: Organized folder structure for input, output, and unlocked PDFs
+- **⚙️ Centralized Configuration**: Easy-to-manage configuration system for file paths
 - **🧪 Comprehensive Testing**: Full test suite with mock and real file testing
 - **🛠️ CLI Tools**: Command-line interface for password management
 - **📊 Test Framework**: Reusable test framework with filtering and reporting
 
 ## 🚧 Still To Be Implemented
 
-- **📄 PDF Transaction Extraction**: Parse transaction data from unlocked PDFs
 - **📊 Data Export**: Export transactions to Google Sheets or Excel
 - **💰 Financial Calculations**: Calculate totals for income and expenses
-- **🔄 Transaction Processing**: Structure and categorize transaction data
+- **🔄 Transaction Processing**: Advanced transaction categorization and analysis
 
 ## 🎯 Project Overview
 
-This project provides a secure way to unlock password-protected PDF files and will eventually extract transaction data for financial analysis. The current implementation focuses on the PDF unlocking and password management infrastructure.
+This project provides a secure way to unlock password-protected PDF files and extract transaction data for financial analysis. The implementation includes password management, PDF unlocking, intelligent transaction extraction, and CSV export with automatic file naming.
 
 ## Installation
 
@@ -71,7 +73,7 @@ python scripts/password_cli.py
    - Manage categories
    - Reset encryption
 
-### PDF Unlocking
+### PDF Unlocking & Transaction Extraction
 
 1. **Place password-protected PDFs in:**
 ```
@@ -83,10 +85,12 @@ pdf_files/input/
 python main.py
 ```
 
-3. **Unlocked PDFs will be saved to:**
-```
-pdf_files/unlocked/
-```
+3. **The application will:**
+   - Unlock password-protected PDFs using stored passwords
+   - Extract transaction data from unlocked PDFs
+   - Save unlocked PDFs to `pdf_files/unlocked/`
+   - Export transactions to CSV files in `pdf_files/output/`
+   - Automatically increment filenames to avoid overwriting (e.g., `transactions.csv`, `transactions_1.csv`, `transactions_2.csv`)
 
 ### Testing
 
@@ -103,6 +107,9 @@ python src/tests/test_password_manager.py
 # PDF Unlocker tests  
 python src/tests/test_pdf_unlocker.py
 
+# Transaction Extractor tests
+python src/tests/test_transaction_extractor.py
+
 # Integration tests
 python src/tests/test_integration.py
 ```
@@ -113,9 +120,12 @@ python src/tests/test_integration.py
 python src/tests/test_password_manager.py --filter init
 python src/tests/test_password_manager.py --filter encrypt
 python src/tests/test_pdf_unlocker.py --filter mock
+python src/tests/test_transaction_extractor.py --filter pattern_matching
+python src/tests/test_transaction_extractor.py --filter incremental_naming
 
 # List available test filters
 python src/tests/test_password_manager.py --list
+python src/tests/test_transaction_extractor.py --list
 ```
 
 ## 📁 Project Structure
@@ -131,22 +141,46 @@ book_keep/
 ├── 📁 scripts/                   # Utility scripts
 │   └── password_cli.py          # Password management CLI
 ├── 📁 src/                       # Source code
+│   ├── config.py                # Centralized configuration
 │   ├── password_manager.py      # Password encryption/decryption
 │   ├── pdf_unlocker.py          # PDF unlocking functionality
+│   ├── transaction_extractor.py # Transaction data extraction
 │   └── 📁 tests/                 # Test files
 │       ├── run_tests.py         # Test runner
 │       ├── test_runner.py       # Test framework
 │       ├── test_password_manager.py
 │       ├── test_pdf_unlocker.py
+│       ├── test_transaction_extractor.py
 │       └── test_integration.py
 ├── 📁 pdf_files/                 # PDF file storage
 │   ├── input/                   # Password-protected PDFs
-│   ├── output/                  # Processed PDFs (future)
+│   ├── output/                  # Exported transaction CSVs
 │   └── unlocked/                # Unlocked PDFs
 └── 📁 config/                   # Configuration files
 ```
 
 ## 🔧 Configuration
+
+### Centralized Configuration
+All file paths are managed through `src/config.py`. This makes it easy to change directories without modifying multiple files:
+
+```python
+from config import Config
+
+# Get directory paths
+input_dir = Config.get_pdf_input_dir()      # pdf_files/input
+unlocked_dir = Config.get_pdf_unlocked_dir()  # pdf_files/unlocked
+output_dir = Config.get_pdf_output_dir()     # pdf_files/output
+
+# Get file paths
+passwords_file = Config.get_passwords_file()  # data/passwords.json
+master_key = Config.get_master_key_file()    # data/master.key
+
+# Ensure all directories exist
+Config.ensure_directories()
+```
+
+To customize paths, modify `src/config.py` or pass custom paths when initializing components.
 
 ### Password Management
 
@@ -170,10 +204,9 @@ python scripts/password_cli.py
 pdf_files/input/
 ```
 
-2. **Unlocked PDFs will appear in:**
-```
-pdf_files/unlocked/
-```
+2. **After running `main.py`:**
+   - Unlocked PDFs will appear in: `pdf_files/unlocked/`
+   - Transaction CSV files will appear in: `pdf_files/output/`
 
 ### Security Notes
 
@@ -205,6 +238,10 @@ pdf_files/unlocked/
 
 **PDF Unlocker Tests:**
 - `mock` - Mock data tests (no real files needed)
+
+**Transaction Extractor Tests:**
+- `pattern_matching` - Transaction pattern matching tests
+- `incremental_naming` - CSV filename incremental naming tests
 
 ### Test Examples
 
@@ -240,39 +277,63 @@ Options:
 8. Exit
 ```
 
-### PDF Unlocking Process
+### Complete PDF Processing Workflow
 ```
-🔓 Testing PDF Unlocker
-======================
+🚀 BookKeep - Complete PDF Processing System
+==================================================
 
-📄 Found 1 PDF file(s):
+📄 Step 1: Checking for PDF files...
+✅ Found 1 PDF file(s):
   1. tng_ewallet_transactions.pdf
 
-🔑 Testing with 1 passwords from passwords.json...
-PDF is encrypted. Trying passwords...
-Trying password 1/1: 162407577
-Password 162407577 unlocked the PDF.
-PDF tng_ewallet_transactions.pdf unlocked successfully with password: 162407577
-Unlocked PDF saved to: tng_ewallet_transactions.pdf
+🔑 Step 2: Loading passwords...
+✅ Loaded 1 passwords from 1 categories
 
-📊 Summary: 1/1 PDFs processed successfully
+🔓 Step 3: Unlocking PDFs...
+✅ Successfully unlocked 1/1 PDFs
+
+📊 Step 4: Extracting transactions to CSV...
+✅ Extracted 246 transactions from 'tng_ewallet_transactions.pdf' to 'tng_ewallet_transactions_transactions.csv'
+
+📈 Step 5: Transaction Extraction Results
+------------------------------
+CSV Files Generated: 1
+
+📁 Generated Files:
+  - tng_ewallet_transactions_transactions.csv
+
+🎉 Transaction extraction complete! Check 'pdf_files/output/' for CSV files
 ```
 
 ### Test Results
 ```
-🔑 Testing Password Manager - Comprehensive Unit Tests
+🚀 BookKeep Test Suite
 ============================================================
+🧪 Running: src/tests/test_password_manager.py
+✅ PASSED - test_password_manager.py
 
-✅ PASSED - Initialization
-✅ PASSED - Encryption/Decryption  
-✅ PASSED - Password Loading
-✅ PASSED - Password Addition
-✅ PASSED - Category Management
-✅ PASSED - File Operations
-✅ PASSED - Error Handling
-✅ PASSED - Integration Test
+🧪 Running: src/tests/test_pdf_unlocker.py  
+✅ PASSED - test_pdf_unlocker.py
 
-📈 Total: 8 passed, 0 failed
+🧪 Running: src/tests/test_transaction_extractor.py
+✅ PASSED - test_transaction_extractor.py
+
+🧪 Running: src/tests/test_transaction_parser.py
+✅ PASSED - test_transaction_parser.py
+
+🧪 Running: src/tests/test_integration.py
+✅ PASSED - test_integration.py
+
+============================================================
+📊 TEST SUMMARY
+============================================================
+✅ PASSED - src/tests/test_password_manager.py
+✅ PASSED - src/tests/test_pdf_unlocker.py
+✅ PASSED - src/tests/test_transaction_extractor.py
+✅ PASSED - src/tests/test_transaction_parser.py
+✅ PASSED - src/tests/test_integration.py
+
+📈 Results: 5 passed, 0 failed
 🎉 All tests passed!
 ```
 
@@ -291,6 +352,8 @@ The application includes robust error handling for:
 - **File permission errors**: Clear error messages for file access issues
 - **Password decryption errors**: Fallback to plain text if decryption fails
 - **Missing dependencies**: Clear error messages for missing libraries
+- **Transaction extraction errors**: Handles malformed PDF data gracefully
+- **File collision errors**: Automatic filename incrementation prevents overwriting
 
 ## Contributing
 
@@ -319,11 +382,12 @@ For issues and questions:
 - [x] Secure password management
 - [x] Comprehensive testing framework
 
-### Phase 2: Transaction Processing (🚧 IN PROGRESS)
-- [ ] PDF text extraction from unlocked PDFs
-- [ ] Transaction data parsing
-- [ ] Date and amount extraction
-- [ ] Transaction categorization
+### Phase 2: Transaction Processing (✅ COMPLETED)
+- [x] PDF text extraction from unlocked PDFs
+- [x] Intelligent transaction data parsing with pattern matching
+- [x] Date, status, type, amount, and balance extraction
+- [x] CSV export with incremental file naming
+- [x] Centralized configuration system
 
 ### Phase 3: Data Export (📋 PLANNED)
 - [ ] Excel export functionality
@@ -339,7 +403,15 @@ For issues and questions:
 
 ## 📝 Changelog
 
-### Version 0.2.0 (Current)
+### Version 0.3.0 (Current)
+- ✅ PDF transaction extraction with intelligent pattern matching
+- ✅ CSV export with automatic incremental file naming
+- ✅ Centralized configuration system for easy path management
+- ✅ Enhanced transaction type detection (handles split words like DUITNOW_RECEIVEFROM)
+- ✅ Complete test coverage including incremental naming tests
+- ✅ Fixed PDF unlocker mock tests to properly test functionality
+
+### Version 0.2.0
 - ✅ PDF password unlocking with encrypted storage
 - ✅ Comprehensive test framework with filtering
 - ✅ Password management CLI

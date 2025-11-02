@@ -8,13 +8,14 @@ import re
 from pathlib import Path
 from typing import List, Dict, Optional
 from datetime import datetime
+from config import Config
 
 class TransactionExtractor:
     def __init__(self, 
-                 unlocked_dir: str = "pdf_files/unlocked",
-                 output_dir: str = "pdf_files/output"):
-        self.unlocked_dir = Path(unlocked_dir)
-        self.output_dir = Path(output_dir)
+                 unlocked_dir: Optional[str] = None,
+                 output_dir: Optional[str] = None):
+        self.unlocked_dir = Path(unlocked_dir) if unlocked_dir else Config.get_pdf_unlocked_dir()
+        self.output_dir = Path(output_dir) if output_dir else Config.get_pdf_output_dir()
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
         # Pattern to match transaction lines - simplified approach
@@ -158,12 +159,35 @@ class TransactionExtractor:
             if word in transaction_types:
                 return word
         
-        # Try progressive combinations (2-4 words)
+        # Try progressive combinations (2-4 words) WITH spaces
+        # Iterate longer phrases FIRST to match more specific types before general ones
         for i in range(len(words)):
-            for j in range(i + 2, min(i + 5, len(words) + 1)):  # 2-4 words
-                phrase = " ".join(words[i:j])
-                if phrase in transaction_types:
-                    return phrase
+            for word_count in range(4, 1, -1):  # Try 4 words, then 3, then 2
+                j = i + word_count
+                if j <= len(words):
+                    phrase = " ".join(words[i:j])
+                    if phrase in transaction_types:
+                        return phrase
+        
+        # If no match with spaces, try WITHOUT spaces (for split underscore types)
+        # Iterate longer phrases FIRST here too
+        for i in range(len(words)):
+            for word_count in range(4, 1, -1):  # Try 4 words, then 3, then 2
+                j = i + word_count
+                if j <= len(words):
+                    phrase = "".join(words[i:j])  # No space
+                    if phrase in transaction_types:
+                        return phrase
+                    
+                    # Also check if joined phrase contains a transaction type with underscores
+                    # Only check underscore-based types to avoid false matches
+                    underscore_types = ["DUITNOW_RECEIVEFROM"]
+                    for tx_type in underscore_types:
+                        # Just remove spaces for comparison, keep underscores
+                        tx_normalized = tx_type.replace(" ", "")
+                        phrase_normalized = phrase.replace(" ", "")
+                        if tx_normalized in phrase_normalized:
+                            return tx_type
         
         # Fallback: use first few words as transaction type
         return " ".join(words[:3]) if len(words) >= 3 else " ".join(words)
@@ -211,8 +235,16 @@ class TransactionExtractor:
                 print(f"⚠️ No transactions found in {pdf_path.name}")
                 return None
             
-            # Create output CSV
-            output_csv_path = self.output_dir / f"{pdf_path.stem}_transactions.csv"
+            # Create output CSV with incremented name if file exists
+            base_name = f"{pdf_path.stem}_transactions"
+            output_csv_path = self.output_dir / f"{base_name}.csv"
+            
+            # If file exists, increment the number
+            if output_csv_path.exists():
+                counter = 1
+                while output_csv_path.exists():
+                    output_csv_path = self.output_dir / f"{base_name}_{counter}.csv"
+                    counter += 1
             
             with open(output_csv_path, 'w', encoding='utf-8', newline='') as csvfile:
                 fieldnames = ['date', 'status', 'transaction_type', 'amount', 'wallet_balance']

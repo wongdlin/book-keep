@@ -2,11 +2,12 @@ import os
 from pathlib import Path
 from typing import List, Dict, Optional, Tuple
 from PyPDF2 import PdfReader, PdfWriter
+from config import Config
 
 class PdfUnlocker:
-    def __init__(self, input_dir="pdf_files/input", unlocked_dir="pdf_files/unlocked"):
-        self.input_dir = Path(input_dir)
-        self.unlocked_dir = Path(unlocked_dir)
+    def __init__(self, input_dir: Optional[str] = None, unlocked_dir: Optional[str] = None):
+        self.input_dir = Path(input_dir) if input_dir else Config.get_pdf_input_dir()
+        self.unlocked_dir = Path(unlocked_dir) if unlocked_dir else Config.get_pdf_unlocked_dir()
         
         # Create directories if they don't exist
         self.input_dir.mkdir(parents=True, exist_ok=True)

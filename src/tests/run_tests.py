@@ -28,7 +28,9 @@ def main():
     # Define test files in order
     test_files = [
         "src/tests/test_password_manager.py",
-        "src/tests/test_pdf_unlocker.py", 
+        "src/tests/test_pdf_unlocker.py",
+        "src/tests/test_transaction_extractor.py",
+        "src/tests/test_transaction_parser.py",
         "src/tests/test_integration.py"
     ]
     

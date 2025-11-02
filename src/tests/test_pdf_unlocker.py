@@ -56,7 +56,7 @@ def test_with_mocks():
         print("\n1. Testing PDF encryption detection...")
         
         # Mock a non-encrypted PDF
-        with patch('PyPDF2.PdfReader') as mock_reader:
+        with patch('pdf_unlocker.PdfReader') as mock_reader:
             mock_reader_instance = Mock()
             mock_reader_instance.is_encrypted = False
             mock_reader.return_value = mock_reader_instance
@@ -65,7 +65,7 @@ def test_with_mocks():
             print(f"   ✅ Non-encrypted PDF detection: {is_encrypted}")
         
         # Mock an encrypted PDF
-        with patch('PyPDF2.PdfReader') as mock_reader:
+        with patch('pdf_unlocker.PdfReader') as mock_reader:
             mock_reader_instance = Mock()
             mock_reader_instance.is_encrypted = True
             mock_reader.return_value = mock_reader_instance
@@ -81,7 +81,7 @@ def test_with_mocks():
         fake_pdf.write_bytes(b"fake pdf content")
         
         # Mock the PDF reader for unlocking
-        with patch('PyPDF2.PdfReader') as mock_reader:
+        with patch('pdf_unlocker.PdfReader') as mock_reader:
             mock_reader_instance = Mock()
             mock_reader_instance.is_encrypted = True
             mock_reader_instance.decrypt = Mock(side_effect=lambda pwd: pwd == "test456")
@@ -104,8 +104,8 @@ def test_with_mocks():
             pdf.write_bytes(b"fake pdf content")
         
         # Mock the complete process
-        with patch('PyPDF2.PdfReader') as mock_reader, \
-             patch('PyPDF2.PdfWriter') as mock_writer, \
+        with patch('pdf_unlocker.PdfReader') as mock_reader, \
+             patch('pdf_unlocker.PdfWriter') as mock_writer, \
              patch('shutil.copy2') as mock_copy:
             
             # Setup mocks
